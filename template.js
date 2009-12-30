@@ -57,9 +57,16 @@ Template.Helper = {
 Template.prototype = {
 
     expand: function(data) {
-        var node = this.element.cloneNode(true);
-        this.expandData(data, node);
-        return node;
+        var container = document.createElement('div');
+
+        container.appendChild(this.element.cloneNode(true));
+        this.expandData(data, container.childNodes[0]);
+
+        var nodes = [];
+        for (i = 0; i < container.childNodes.length; i++) {
+            nodes.push(container.childNodes[i]);
+        }
+        return nodes;
     },
 
     expandData: function(data, node) {
@@ -212,6 +219,10 @@ Template.prototype = {
 
 if ( typeof jQuery != "undefined" ) {
     jQuery.fn.expand = function(template, data) {
-        return this.html(template.expand(data));
+        var nodes = template.expand(data);
+        for (var i=0; i<nodes.length; i++) {
+            this.append(nodes[i]);
+        }
+        return this;
     };
 }

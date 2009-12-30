@@ -20,12 +20,19 @@
         // The comments template will be removed from the DOM!
         var template = new Template('comments-template');
         
-        // template will result in a new DOM node
+        // template will result in an array of new DOM nodes:
+        //  - if data is an array the result will contain the expansions of
+        //    each of data's items in the template.
+        //  - if data is not an array the result will contain one node that is
+        //    the expansion of data in the template. 
+        //    (this is the case in this example.)
         var result = template.expand(data);
         
-        // insert the resulting node into the comments container
+        // insert the resulting node(s) into the comments container
         var container = document.getElementsByClassName('comments')[0];
-        container.appendChild(result);
+        for (var i=0; i<result.length; i++) {
+            container.appendChild(result[i]);
+        }
       };
     </script>
     <style type="text/css">
