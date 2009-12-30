@@ -38,7 +38,7 @@ This data will be expanded with help of following template:
                 {website.length > 0 ? linkTo(name, website) : name} said
                 <a title="{time}"></a>:
               </div>
-              <div class="text">
+              <div class="content">
                 {text}
               </div>
             </div>   
@@ -144,4 +144,3 @@ Without jQuery template expansion is a bit verbose:
     // insert the resulting node into the comments container
     var container = document.getElementsByClassName('comments')[0];
     container.appendChild(result);
-

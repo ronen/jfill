@@ -1,0 +1,52 @@
+<html>
+  <head>
+    <script type="text/javascript" src="template.js"></script>
+    <script type="text/javascript">
+      window.onload = function () {
+        var data = { 
+          comment: [{
+            time: "2008-09-07 12:28:33", 
+            name: "David Beckham",
+            website: "beckham.com",
+            text: "I watched the euro finals on tv..." 
+          }, { 
+            time: "2008-09-07 14:28:33", 
+            name: "Tuncay",
+            website: "",
+            text: "Me too"
+          }]
+        };
+
+        // The comments template will be removed from the DOM!
+        var template = new Template('comments-template');
+        
+        // template will result in a new DOM node
+        var result = template.expand(data);
+        
+        // insert the resulting node into the comments container
+        var container = document.getElementsByClassName('comments')[0];
+        container.appendChild(result);
+      };
+    </script>
+    <style type="text/css">
+      .comment { border-bottom: 1px solid black; }
+      .top { font-style: italic; }
+      .content { margin-left: 20px; }
+    </style>
+  </head>
+  <body>
+    <div class="comments">  
+      <div id="comments-template">
+        <div class="comment">
+          <div class="top">
+            {website.length > 0 ? linkTo(name, website) : name} said
+            <a title="{time}"></a>:
+          </div>
+          <div class="content">
+            {text}
+          </div>
+        </div>   
+      </div>
+    </div>
+  </body>
+</html>
