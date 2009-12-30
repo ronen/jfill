@@ -25,8 +25,12 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-function Template(id) {
-    this.element = document.getElementById(id);
+function Template(expr) {
+    if ( typeof jQuery != "undefined" ) {
+        this.element = $(expr).get(0);
+    } else {
+        this.element = document.getElementById(expr);
+    }
     this.eval = {};
 
     if (this.element) {
