@@ -1,4 +1,19 @@
 /*
+ * JFill - Javascript Template Engine
+ *
+ *                                         Ronen Barzel
+ * [see README.txt]
+ *
+ */
+
+/*
+ * inspired by and based on Patroon by Matthias Georgi (matthias-georgi.de)
+ * major changes:
+ *   - top level can be an array
+ *   - scoped everything with JFill
+ *
+ * much of the code comes directly from patroon, that code is covered by
+ * the following copyright:
  * Patroon - Javascript Template Engine
  *
  * Copyright (c) 2008 Matthias Georgi (matthias-georgi.de)
@@ -25,7 +40,20 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-function Template(expr) {
+var JFill = function() {
+  if ( typeof jQuery != "undefined" ) {
+      jQuery.fn.jfill = function(template, data) {
+          var nodes = template.fill(data);
+          for (var i=0; i<nodes.length; i++) {
+            this.append(nodes[i]);
+        }
+        return this;
+    };
+  }
+  return {}
+}();
+
+JFill.Template = function (expr) {
     if ( typeof jQuery != "undefined" ) {
         this.element = $(expr).get(0);
     } else {
@@ -43,7 +71,7 @@ function Template(expr) {
 };
 
 
-Template.Helper = {
+JFill.Template.Helper = {
 
     linkTo: function(text, url) {
         if (url.indexOf('http://') == -1 && url[0] != '/' && url[0] != '#') {
@@ -54,9 +82,9 @@ Template.Helper = {
 
 };
 
-Template.prototype = {
+JFill.Template.prototype = {
 
-    expand: function(data) {
+    fill: function(data) {
         var container = document.createElement('div');
 
         container.appendChild(this.element.cloneNode(true));
@@ -191,7 +219,7 @@ Template.prototype = {
             out.push("'" + cur + "'");
         }
 
-        this.eval[str] = new Function('data', 'with(Template.Helper) with (data) return ' + out.join('+') + ';' );
+        this.eval[str] = new Function('data', 'with(JFill.Template.Helper) with (data) return ' + out.join('+') + ';' );
     },
 
     compileNode: function(node) {
@@ -217,12 +245,3 @@ Template.prototype = {
 
 };
 
-if ( typeof jQuery != "undefined" ) {
-    jQuery.fn.expand = function(template, data) {
-        var nodes = template.expand(data);
-        for (var i=0; i<nodes.length; i++) {
-            this.append(nodes[i]);
-        }
-        return this;
-    };
-}
