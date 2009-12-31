@@ -51,39 +51,48 @@ expands arrays and subobjects into the template.
       + Metadata: In the evaluation context, a metadata object named jfill
         is available at each scope, having the following properties:
 
-         jfill.data      - the object at the current scope
+         jfill.data      - The object at the current scope
 
-         jfill.parent    - the medata of the containing scope. undefined if
+         jfill.parent    - The medata of the containing scope. undefined if
                            at the root scope.
 
-         jfill.array     - if currently filling from an array, this
+         jfill.array     - If currently filling from an array, this
                            references the entire array.
 
-         jfill.index     - if currently filling from an array, the value is
+         jfill.index     - If currently filling from an array, the value is
                            the index of the current object in jfill.array.
-                           otherwise the value is undefined.
+                           Otherwise the value is undefined.
 
-         jfill.oddEven   - the string "odd" if jfill.index is odd, "even"
-                           if jfill.index is even.  undefined if not
+         jfill.oddEven   - The string "odd" if jfill.index is odd, "even"
+                           if jfill.index is even.  Undefined if not
                            filling from an array.
 
-         jfill.isFirst   - true if filling from an array and at the first
+         jfill.isFirst   - True if filling from an array and at the first
                            item in the array, i.e. if jfill.index == 0.
-                           undefined if not filling from an array.
+                           Undefined if not filling from an array.
 
-         jfill.isLast    - true if filling from an array and at the last
+         jfill.isLast    - True if filling from an array and at the last
                            item in the array, i.e. if jfill.index ==
-                           jfill.array.length-1.  undefined if not filling
+                           jfill.array.length-1.  Undefined if not filling
                            from an array.
 
-         jfill.firstLast - if filling from an array, one of the strings:
+         jfill.firstLast - If filling from an array, one of the strings:
                            "", "first", "last", or "first last", based on
-                           isFirst and isLast.  undefined if not filling
+                           isFirst and isLast.  Undefined if not filling
                            from an array.
 
          For example, a template for an array row might include:
            <tr class="{jfill.firstLast} {jfill.oddEven}">...</tr>
 
+      + Arrays and Id's: When filling an element from an array, if the
+        element has an id, the template can include javascript to compute
+        a unique id for each copy.  For example:
+            <li jfill:scope="items" id="item-{itemid}">...</li>
+        As a convenience, if the template doesn't fill with a new id, jfill
+        will append "-" plus the array index.  Thus the following are
+        equivalent:
+            <li jfill:scope="items" id="item">...</li>
+            <li jfill:scope="items" id="item-{jfill.index}">...</li>
 
 ### Example
 
@@ -164,13 +173,12 @@ The code to run the above example without jQuery is:
     for (var i=0; i<result.length; i++) {
         container.appendChild(result[i]);
     }
-
     // since the example data is a single object rather than an array, the result
     // in this case will have only one child, so we could simply use
     //    container.appendChild(result[0]); 
     // but showing the more general code for reference.
 
-For a working example, see example.html
+For a more complex working example, see example.html
 
 ### Credits
 
@@ -190,3 +198,4 @@ The major differences in functionality are:
       is.  (this means that interpolation can't add nodes, only text, which
       obviates the linkTo helper.  since that was the only helper, removed
       the helper mechanism.)
+    - added array id uniquifying

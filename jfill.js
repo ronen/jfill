@@ -115,13 +115,15 @@ JFill.Template.prototype = {
 
     expandArray: function(data, node, metadata) {
         var parent = node.parentNode;
-        var sibling = node.nextSibling;
-        parent.removeChild(node);
         for (var i = 0; i < data.length; i++) {
             var child = node.cloneNode(true);
-            parent.insertBefore(child, sibling);
             this.expandData(data[i], child, new JFill.Metadata(data[i], {array: data, index: i, parent: metadata.parent}));
+            if (child.id && child.id == node.id) {
+                child.id = child.id + "-" + i;
+            }
+            parent.insertBefore(child, node);
         }
+        parent.removeChild(node);
     },
 
     expandObject: function(object, node, metadata) {
