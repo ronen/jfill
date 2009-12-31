@@ -71,17 +71,6 @@ JFill.Template = function (expr) {
 };
 
 
-JFill.Template.Helper = {
-
-    linkTo: function(text, url) {
-        if (url.indexOf('http://') == -1 && url[0] != '/' && url[0] != '#') {
-            url = 'http://' + url;
-        }
-        return '<a href="' + url +'">' + text + '</a>';
-    }
-
-};
-
 JFill.Template.prototype = {
 
     fill: function(data) {
@@ -156,9 +145,7 @@ JFill.Template.prototype = {
                 this.expandData(object, child, metadata);
             }
             if (child.nodeType == 3 && this.eval[child.nodeValue])  {
-                var span = document.createElement('span');
-                span.innerHTML = this.eval[child.nodeValue](object, metadata);
-                child.parentNode.replaceChild(span, child);
+                child.nodeValue = this.eval[child.nodeValue](object, metadata);
             }
         }
     },
@@ -232,7 +219,7 @@ JFill.Template.prototype = {
         else {
             body = "return " + out.join('+') + ";";
         }
-        this.eval[key] = new Function('data', 'jfill', 'with(JFill.Template.Helper) with (data) ' + body);
+        this.eval[key] = new Function('data', 'jfill', 'with (data) ' + body);
     },
 
     compileNode: function(node) {

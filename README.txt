@@ -186,3 +186,7 @@ The major differences in functionality are:
     - added "jfill" metadata object to interpolation context.
     - introduced jfill:scope attribute for scope context, rather than matching class names to object properties.
     - introduced jfill:if attribute for conditional parts of template
+    - don't add <span> around interpolated text -- keep template html as
+      is.  (this means that interpolation can't add nodes, only text, which
+      obviates the linkTo helper.  since that was the only helper, removed
+      the helper mechanism.)
