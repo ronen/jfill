@@ -98,7 +98,25 @@ JFill.Template.prototype = {
     },
 
     expandData: function(data, node, metadata) {
-        if (data.constructor == Array) {
+        if (data) {
+            var expr;
+            if (expr = node.getAttribute("jfill:if")) {
+                node.removeAttribute("jfill:if");
+                if (!this.eval["jfill:"+expr](data, metadata)) {
+                    data = undefined;
+                }
+            }
+            if (expr = node.getAttribute("jfill:scope")) {
+                node.removeAttribute("jfill:scope");
+                data = this.eval["jfill:"+expr](data, metadata);
+                metadata = new JFill.Metadata(data, {parent: metadata});
+            }
+        }
+
+        if (data == undefined) {
+            node.parentNode.removeChild(node);
+        }
+        else if (data.constructor == Array) {
             this.expandArray(data, node, metadata);
         }
         else {
@@ -113,23 +131,6 @@ JFill.Template.prototype = {
         for (var i = 0; i < data.length; i++) {
             var child = node.cloneNode(true);
             parent.insertBefore(child, sibling);
-        }
-    },
-
-    expandByContext: function(object, node, metadata) {
-        var names = node.className.split(' ');
-        var found = false;
-
-        for (var i = 0; i < names.length; i++) {
-            var name = names[i];
-            if (object[name]) {
-                this.expandData(object[name], node, new JFill.Metadata(object[name], {parent: metadata}));
-                found = true;
-            }
-        }
-
-        if (!found) {
-            this.expandObject(object, node, metadata);
             this.expandData(data[i], child, new JFill.Metadata(data[i], {array: data, index: i, parent: metadata.parent}));
         }
     },
@@ -152,7 +153,7 @@ JFill.Template.prototype = {
         for (i = 0; i < nodes.length; i++) {
             var child = nodes[i];
             if (child.nodeType == 1) {
-                this.expandByContext(object, child, metadata);
+                this.expandData(object, child, metadata);
             }
             if (child.nodeType == 3 && this.eval[child.nodeValue])  {
                 var span = document.createElement('span');
@@ -163,13 +164,19 @@ JFill.Template.prototype = {
     },
 
 
-    compile: function(str) {
-        var len = str.length;
+    compile: function(str,isControl) {
         var expr = false;
         var cur = '';
         var out = [];
         var braces = 0;
+        var key = str;
 
+        if (isControl) {
+            key = "jfill:" + str;
+            if (str[0] != '{') str = '{' + str + '}';
+        }
+
+        var len = str.length;
         for (var i = 0; i < len; i++) {
             var c = str[i];
 
@@ -219,7 +226,13 @@ JFill.Template.prototype = {
             out.push("'" + cur + "'");
         }
 
-        this.eval[str] = new Function('data', 'jfill', 'with(JFill.Template.Helper) with (data) return ' + out.join('+') + ';' );
+        if (isControl) {
+            body = "try { return " + out[0] + "; } catch (ReferenceError) { return undefined; }";
+        }
+        else {
+            body = "return " + out.join('+') + ";";
+        }
+        this.eval[key] = new Function('data', 'jfill', 'with(JFill.Template.Helper) with (data) ' + body);
     },
 
     compileNode: function(node) {
@@ -227,8 +240,11 @@ JFill.Template.prototype = {
 
         if (node.nodeType == 1) {
             for (i = 0; i < node.attributes.length; i++) {
-                var value = node.attributes[i].value;
-                if (value.indexOf('{') > -1) {
+                var name = node.attributes[i].nodeName;
+                var value = node.attributes[i].nodeValue;
+                if (name.indexOf("jfill:") == 0) {
+                    this.compile(value, true);
+                } else if (value.indexOf('{') > -1) {
                     this.compile(value);
                 }
             }

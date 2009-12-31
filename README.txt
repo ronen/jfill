@@ -33,6 +33,21 @@ expands arrays and subobjects into the template.
         or an arbitrary expression
             <div>Spelling: {name.toUpperCase.split('').join('-')}</div>
 
+      + Conditional: If any element has an attribute jfill:if="condition", 
+        JFill evalutes the condition expression in the context of the
+        current data object; if the result is false or undefined, the
+        element and its subtree will be pruned, otherwise the element is
+        filled normally.  (The condition expression may optionally be
+        enclosed in braces { } ).
+ 
+      + Scoping: If any element has an attribute jfill:scope="subdata",
+        JFill evalutes the subdata expression in the context of the current
+        data object.  If the result is undefined, the element and its
+        subtree will be pruned, same as for jfill:if.  Otherwise, JFill
+        recursively fills the element's subtree in the context of the
+        resulting object or array.  (The subdata expression may optionally
+        be enclosed in braces { }.).
+
       + Metadata: In the evaluation context, a metadata object named jfill
         is available at each scope, having the following properties:
 
@@ -167,5 +182,7 @@ functionality, and arguably the spirit, in a non-backwards-compatible way,
 and so the library has been renamed.
 
 The major differences in functionality are:
-    - scoped in a JFill namespace rather than defining Template at global scope
+    - put in a JFill namespace rather than defining Template at global scope
     - added "jfill" metadata object to interpolation context.
+    - introduced jfill:scope attribute for scope context, rather than matching class names to object properties.
+    - introduced jfill:if attribute for conditional parts of template

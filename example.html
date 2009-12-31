@@ -4,6 +4,7 @@
     <script type="text/javascript">
       window.onload = function () {
         var data = { 
+          topic: "Football",
           comment: [{
             time: "2008-09-07 12:28:33", 
             name: "David Beckham",
@@ -36,21 +37,31 @@
       };
     </script>
     <style type="text/css">
-      .comment { border-bottom: 1px solid black; }
+      .comment.odd { background: #eeeeee; }
+      .comment.even { background: #ffffff; }
       .top { font-style: italic; }
-      .content { margin-left: 20px; }
+      .text { margin-left: 20px; }
     </style>
   </head>
   <body>
     <div class="comments">  
       <div id="comments-template">
-        <div class="comment {jfill.firstLast}">
+        <h2>{topic}</h2>
+        <div jfill:scope="comment" class="comment {jfill.oddEven}">
           <div class="top">
-            <span class="index">{jfill.index+1}.</span>
-            {website.length > 0 ? linkTo(name, website) : name} said
+            <span class="index">
+              {jfill.index+1}.
+            </span>
+            <a class="name" jfill:if="website" href="{(website.indexOf('http://')==0? '' : 'http://') + website}">
+              {name}
+            </a>
+            <span class="name" jfill:if="!website">
+              {name}
+            </span>
+            said (responding to '{jfill.parent.data.topic}')
             <a title="{time}"></a>:
           </div>
-          <div class="content">
+          <div class="text">
             {text}
           </div>
         </div>   
