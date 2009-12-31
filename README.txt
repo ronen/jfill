@@ -33,6 +33,41 @@ expands arrays and subobjects into the template.
         or an arbitrary expression
             <div>Spelling: {name.toUpperCase.split('').join('-')}</div>
 
+      + Metadata: In the evaluation context, a metadata object named jfill
+        is available at each scope, having the following properties:
+
+         jfill.data      - the object at the current scope
+
+         jfill.parent    - the medata of the containing scope. undefined if
+                           at the root scope.
+
+         jfill.array     - if currently filling from an array, this
+                           references the entire array.
+
+         jfill.index     - if currently filling from an array, the value is
+                           the index of the current object in jfill.array.
+                           otherwise the value is undefined.
+
+         jfill.oddEven   - the string "odd" if jfill.index is odd, "even"
+                           if jfill.index is even.  undefined if not
+                           filling from an array.
+
+         jfill.isFirst   - true if filling from an array and at the first
+                           item in the array, i.e. if jfill.index == 0.
+                           undefined if not filling from an array.
+
+         jfill.isLast    - true if filling from an array and at the last
+                           item in the array, i.e. if jfill.index ==
+                           jfill.array.length-1.  undefined if not filling
+                           from an array.
+
+         jfill.firstLast - if filling from an array, one of the strings:
+                           "", "first", "last", or "first last", based on
+                           isFirst and isLast.  undefined if not filling
+                           from an array.
+
+         For example, a template for an array row might include:
+           <tr class="{jfill.firstLast} {jfill.oddEven}">...</tr>
 
 
 ### Example
@@ -59,8 +94,9 @@ This data can be filled into the following template:
 
         <div class="comments">  
           <div id="comments-template">
-            <div class="comment">
+            <div class="comment {jfill.firstLast}">
               <div class="top">
+                <span class="index">{jfill.index+1}.</span>
                 {website.length > 0 ? linkTo(name, website) : name} said
                 <a title="{time}"></a>:
               </div>
@@ -77,8 +113,9 @@ template has been repeated once for each item in the data.comment array:
 
         <div class="comments">  
           <div id="comments-template">
-            <div class="comment">
+            <div class="comment first">
               <div class="top">
+                <span class="index">1.</span>
                 <a href="http://backham.com">David Beckham</a> said
                 <a title="2008-09-07 12:28:33">2 hours ago</a>
               </div>
@@ -86,8 +123,9 @@ template has been repeated once for each item in the data.comment array:
                 I watched the euro finals on tv...
               </div>
             </div>   
-            <div class="comment">
+            <div class="comment last">
               <div class="top">
+                <span class="index">2.</span>
                 Tuncay said
                 <a title="2008-09-07 14:28:33">1 minute ago</a>
               </div>
@@ -130,3 +168,4 @@ and so the library has been renamed.
 
 The major differences in functionality are:
     - scoped in a JFill namespace rather than defining Template at global scope
+    - added "jfill" metadata object to interpolation context.

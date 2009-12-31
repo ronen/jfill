@@ -44,8 +44,9 @@
   <body>
     <div class="comments">  
       <div id="comments-template">
-        <div class="comment">
+        <div class="comment {jfill.firstLast}">
           <div class="top">
+            <span class="index">{jfill.index+1}.</span>
             {website.length > 0 ? linkTo(name, website) : name} said
             <a title="{time}"></a>:
           </div>

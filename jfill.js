@@ -88,7 +88,7 @@ JFill.Template.prototype = {
         var container = document.createElement('div');
 
         container.appendChild(this.element.cloneNode(true));
-        this.expandData(data, container.childNodes[0]);
+        this.expandData(data, container.childNodes[0], new JFill.Metadata(data));
 
         var nodes = [];
         for (i = 0; i < container.childNodes.length; i++) {
@@ -97,44 +97,44 @@ JFill.Template.prototype = {
         return nodes;
     },
 
-    expandData: function(data, node) {
+    expandData: function(data, node, metadata) {
         if (data.constructor == Array) {
-            this.expandArray(data, node);
+            this.expandArray(data, node, metadata);
         }
         else {
-            this.expandObject(data, node);
+            this.expandObject(data, node, metadata);
         }
     },
 
-    expandArray: function(data, node) {
+    expandArray: function(data, node, metadata) {
         var parent = node.parentNode;
         var sibling = node.nextSibling;
         parent.removeChild(node);
         for (var i = 0; i < data.length; i++) {
             var child = node.cloneNode(true);
             parent.insertBefore(child, sibling);
-            this.expandData(data[i], child);
         }
     },
 
-    expandByContext: function(object, node) {
+    expandByContext: function(object, node, metadata) {
         var names = node.className.split(' ');
         var found = false;
 
         for (var i = 0; i < names.length; i++) {
             var name = names[i];
             if (object[name]) {
-                this.expandData(object[name], node);
+                this.expandData(object[name], node, new JFill.Metadata(object[name], {parent: metadata}));
                 found = true;
             }
         }
 
         if (!found) {
-            this.expandObject(object, node);
+            this.expandObject(object, node, metadata);
+            this.expandData(data[i], child, new JFill.Metadata(data[i], {array: data, index: i, parent: metadata.parent}));
         }
     },
 
-    expandObject: function(object, node) {
+    expandObject: function(object, node, metadata) {
         var i;
         var nodes = [];
 
@@ -145,18 +145,18 @@ JFill.Template.prototype = {
         for (i = 0; i < node.attributes.length; i++) {
             var attr = node.attributes[i];
             if (this.eval[attr.value]) {
-                attr.value = this.eval[attr.value](object);
+                attr.value = this.eval[attr.value](object, metadata);
             }
         }
 
         for (i = 0; i < nodes.length; i++) {
             var child = nodes[i];
             if (child.nodeType == 1) {
-                this.expandByContext(object, child);
+                this.expandByContext(object, child, metadata);
             }
             if (child.nodeType == 3 && this.eval[child.nodeValue])  {
                 var span = document.createElement('span');
-                span.innerHTML = this.eval[child.nodeValue](object);
+                span.innerHTML = this.eval[child.nodeValue](object, metadata);
                 child.parentNode.replaceChild(span, child);
             }
         }
@@ -219,7 +219,7 @@ JFill.Template.prototype = {
             out.push("'" + cur + "'");
         }
 
-        this.eval[str] = new Function('data', 'with(JFill.Template.Helper) with (data) return ' + out.join('+') + ';' );
+        this.eval[str] = new Function('data', 'jfill', 'with(JFill.Template.Helper) with (data) return ' + out.join('+') + ';' );
     },
 
     compileNode: function(node) {
@@ -244,4 +244,21 @@ JFill.Template.prototype = {
     }
 
 };
+
+JFill.Metadata = function(data) {
+    this.data = data;
+
+    opts = arguments[1] || {};
+    this.parent = opts.parent;
+    this.array = opts.array;
+    this.index = opts.index;
+
+    if (this.array) {
+        this.oddEven = (this.index % 2 == 0) ? "even" : "odd";
+        this.isFirst = (this.index == 0);
+        this.isLast = (this.index == (this.array.length - 1));
+        this.firstLast = (this.isFirst && this.isLast ? "first last" : this.isFirst ? "first" : this.isLast ? "last" : "");
+    }
+};
+
 
