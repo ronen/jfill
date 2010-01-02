@@ -1,22 +1,23 @@
 /*
- * JFill - Javascript Template Engine
+ * JFill - Javascript Template Engine, %VERSION%
  *
- *                                         Ronen Barzel
- * [see README.txt]
+ * For usage instructions see:
+ *      http://github.com/ronen/jfill/blob/%VERSION%/README.txt
  *
+ * Version:     %VERSION%
+ * Date:        %VERSIONDATE%
+ * Download:    http://cloud.github.com/downloads/ronen/jfill/jfill-%VERSION%.js
  */
 
 /*
- * inspired by and based on Patroon by Matthias Georgi (matthias-georgi.de)
- * major changes:
- *   - top level can be an array
- *   - scoped everything with JFill
+ * JFill is built upon Patroon by Mattias Georgi (matthias-georgi.de), and
+ * much of the code comes directly from Patroon.  Additional JFill code by
+ * Ronen Barzel (ronenbarzel.org).  The original and additional code are
+ * made available via the "MIT License":
+ * ----
  *
- * much of the code comes directly from patroon, that code is covered by
- * the following copyright:
- * Patroon - Javascript Template Engine
- *
- * Copyright (c) 2008 Matthias Georgi (matthias-georgi.de)
+ * Original Patroon code: Copyright (c) 2008 Matthias Georgi (matthias-georgi.de)
+ * Additional JFill code: Copyright (c) 2010 Ronen Barzel (ronenbarzel.org)
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -29,6 +30,11 @@
  *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
+ * 
+ * Except as contained in this notice, the name(s) of the above copyright
+ * holders shall not be used in advertising or otherwise to promote the
+ * sale, use or other dealings in this Software without prior written
+ * authorization.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES

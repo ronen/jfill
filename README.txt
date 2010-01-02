@@ -192,10 +192,7 @@ and so the library has been renamed.
 The major differences in functionality are:
     - put in a JFill namespace rather than defining Template at global scope
     - added "jfill" metadata object to interpolation context.
-    - introduced jfill:scope attribute for scope context, rather than matching class names to object properties.
+    - introduced  jfill:scope attribute to specify subscope context, rather than matching objects to class names
     - introduced jfill:if attribute for conditional parts of template
-    - don't add <span> around interpolated text -- keep template html as
-      is.  (this means that interpolation can't add nodes, only text, which
-      obviates the linkTo helper.  since that was the only helper, removed
-      the helper mechanism.)
-    - added array id uniquifying
+    - doesn't add <span> around interpolated text -- result's html structure always matches template
+    - doesn't support creating new nodes via interpolated text.  therefore doesn't have helpers.
