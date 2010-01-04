@@ -83,7 +83,7 @@ JFill.Template.prototype = {
         var container = document.createElement('div');
 
         container.appendChild(this.element.cloneNode(true));
-        this.expandData(data, container.childNodes[0], new JFill.Metadata(data));
+        this.expandData(new JFill.Metadata(data), container.childNodes[0]);
 
         var nodes = [];
         for (i = 0; i < container.childNodes.length; i++) {
@@ -92,19 +92,20 @@ JFill.Template.prototype = {
         return nodes;
     },
 
-    expandData: function(data, node, metadata) {
+    expandData: function(metadata, node) {
+        var data = metadata.data;
         if (data) {
             var expr;
             if (expr = node.getAttribute("jfill:if")) {
                 node.removeAttribute("jfill:if");
-                if (!this.eval["jfill:"+expr](data, metadata)) {
+                if (!this.eval["jfill:"+expr](metadata)) {
                     data = undefined;
                 }
             }
             if (expr = node.getAttribute("jfill:scope")) {
                 node.removeAttribute("jfill:scope");
-                data = this.eval["jfill:"+expr](data, metadata);
-                metadata = new JFill.Metadata(data, {parent: metadata});
+                data = this.eval["jfill:"+expr](metadata);
+                metadata = new JFill.Metadata(data, metadata);
             }
         }
 
@@ -112,18 +113,19 @@ JFill.Template.prototype = {
             node.parentNode.removeChild(node);
         }
         else if (data.constructor == Array) {
-            this.expandArray(data, node, metadata);
+            this.expandArray(metadata, node);
         }
         else {
-            this.expandObject(data, node, metadata);
+            this.expandObject(metadata, node);
         }
     },
 
-    expandArray: function(data, node, metadata) {
+    expandArray: function(metadata, node) {
         var parent = node.parentNode;
-        for (var i = 0; i < data.length; i++) {
+        var nitems = metadata.startArray();
+        for (var i = 0; i < nitems; i++) {
             var child = node.cloneNode(true);
-            this.expandData(data[i], child, new JFill.Metadata(data[i], {array: data, index: i, parent: metadata.parent}));
+            this.expandData(metadata.useArrayItem(i), child);
             if (child.id && child.id == node.id) {
                 child.id = child.id + "-" + i;
             }
@@ -132,7 +134,7 @@ JFill.Template.prototype = {
         parent.removeChild(node);
     },
 
-    expandObject: function(object, node, metadata) {
+    expandObject: function(metadata, node) {
         var i;
         var nodes = [];
 
@@ -143,17 +145,17 @@ JFill.Template.prototype = {
         for (i = 0; i < node.attributes.length; i++) {
             var attr = node.attributes[i];
             if (this.eval[attr.value]) {
-                attr.value = this.eval[attr.value](object, metadata);
+                attr.value = this.eval[attr.value](metadata);
             }
         }
 
         for (i = 0; i < nodes.length; i++) {
             var child = nodes[i];
             if (child.nodeType == 1) {
-                this.expandData(object, child, metadata);
+                this.expandData(metadata, child);
             }
             if (child.nodeType == 3 && this.eval[child.nodeValue])  {
-                child.nodeValue = this.eval[child.nodeValue](object, metadata);
+                child.nodeValue = this.eval[child.nodeValue](metadata);
             }
         }
     },
@@ -227,7 +229,7 @@ JFill.Template.prototype = {
         else {
             body = "return " + out.join('+') + ";";
         }
-        this.eval[key] = new Function('data', 'jfill', 'with (data) ' + body);
+        this.eval[key] = new Function('jfill', 'with (jfill.data) ' + body);
     },
 
     compileNode: function(node) {
@@ -256,20 +258,22 @@ JFill.Template.prototype = {
 
 };
 
-JFill.Metadata = function(data) {
+JFill.Metadata = function(data, parent) {
     this.data = data;
-
-    opts = arguments[1] || {};
-    this.parent = opts.parent;
-    this.array = opts.array;
-    this.index = opts.index;
-
-    if (this.array) {
-        this.oddEven = (this.index % 2 == 0) ? "even" : "odd";
-        this.isFirst = (this.index == 0);
-        this.isLast = (this.index == (this.array.length - 1));
-        this.firstLast = (this.isFirst && this.isLast ? "first last" : this.isFirst ? "first" : this.isLast ? "last" : "");
-    }
+    this.parent = parent;
 };
 
+JFill.Metadata.prototype.startArray = function() {
+    this.array = this.data;
+    return this.array.length;
+};
 
+JFill.Metadata.prototype.useArrayItem = function(i) {
+    this.data = this.array[i];
+    this.index = i;
+    this.oddEven = (i % 2 == 0) ? "even" : "odd";
+    this.isFirst = (i == 0);
+    this.isLast = (i == (this.array.length - 1));
+    this.firstLast = (this.isFirst && this.isLast ? "first last" : this.isFirst ? "first" : this.isLast ? "last" : "");
+    return this;
+};
