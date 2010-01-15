@@ -97,13 +97,13 @@ JFill.Template.prototype = {
         if (data) {
             var expr;
             if (expr = node.getAttribute("jfill:if")) {
-                node.removeAttribute("jfill:if");
+                node.setAttribute("jfill:if", null);
                 if (!this.eval["jfill:"+expr](metadata)) {
                     data = undefined;
                 }
             }
             if (expr = node.getAttribute("jfill:scope")) {
-                node.removeAttribute("jfill:scope");
+                node.setAttribute("jfill:scope", null);
                 data = this.eval["jfill:"+expr](metadata);
                 metadata = new JFill.Metadata(data, metadata);
             }
@@ -145,7 +145,13 @@ JFill.Template.prototype = {
         for (i = 0; i < node.attributes.length; i++) {
             var attr = node.attributes[i];
             if (this.eval[attr.value]) {
-                attr.value = this.eval[attr.value](metadata);
+                // handle class specially for IE6 compatibility
+                var result = this.eval[attr.value](metadata);
+                if (attr.name == "class") {
+                    node.setAttribute("class", null);
+                    node.className = result;
+                }
+                else node.setAttribute(attr.name, result);
             }
         }
 
@@ -170,12 +176,12 @@ JFill.Template.prototype = {
 
         if (isControl) {
             key = "jfill:" + str;
-            if (str[0] != '{') str = '{' + str + '}';
+            if (str.substr(0,1) != '{') str = '{' + str + '}';
         }
 
         var len = str.length;
         for (var i = 0; i < len; i++) {
-            var c = str[i];
+            var c = str.substr(i,1);
 
             if (expr) {
                 if (c == '{') {
@@ -239,10 +245,12 @@ JFill.Template.prototype = {
             for (i = 0; i < node.attributes.length; i++) {
                 var name = node.attributes[i].nodeName;
                 var value = node.attributes[i].nodeValue;
-                if (name.indexOf("jfill:") == 0) {
-                    this.compile(value, true);
-                } else if (value.indexOf('{') > -1) {
-                    this.compile(value);
+                if (value && typeof value == "string") {
+                    if (name.indexOf("jfill:") == 0) {
+                        this.compile(value, true);
+                    } else if (value.indexOf('{') > -1) {
+                        this.compile(value);
+                    }
                 }
             }
             for (i = 0; i < node.childNodes.length; i++) {
