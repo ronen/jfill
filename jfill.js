@@ -97,13 +97,13 @@ JFill.Template.prototype = {
         if (data) {
             var expr;
             if (expr = node.getAttribute("jfill:if")) {
-                node.setAttribute("jfill:if", null);
+                node.setAttribute("jfill:if", "");
                 if (!this.eval["jfill:"+expr](metadata)) {
                     data = undefined;
                 }
             }
             if (expr = node.getAttribute("jfill:scope")) {
-                node.setAttribute("jfill:scope", null);
+                node.setAttribute("jfill:scope", "");
                 data = this.eval["jfill:"+expr](metadata);
                 metadata = new JFill.Metadata(data, metadata);
             }
