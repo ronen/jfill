@@ -72,7 +72,7 @@ JFill.Template = function (expr) {
         this.compileNode(this.element);
     }
     else {
-        throw "template not found: " + id;
+        throw "template not found: " + expr;
     }
 };
 
