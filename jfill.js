@@ -61,7 +61,7 @@ var JFill = function() {
 
 JFill.Template = function (expr) {
     if ( typeof jQuery != "undefined" ) {
-        this.element = $(expr).get(0);
+        this.element = jQuery(expr).get(0);
     } else {
         this.element = document.getElementById(expr);
     }
