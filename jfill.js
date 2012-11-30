@@ -244,7 +244,7 @@ JFill.Template.prototype = {
         if (node.nodeType == 1) {
             for (i = 0; i < node.attributes.length; i++) {
                 var name = node.attributes[i].nodeName;
-                var value = node.attributes[i].nodeValue;
+                var value = node.attributes[i].value;
                 if (value && typeof value == "string") {
                     if (name.indexOf("jfill:") == 0) {
                         this.compile(value, true);
